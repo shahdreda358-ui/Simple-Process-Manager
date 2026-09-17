@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Simple Process Manager</title>
+<style>
+  body { font-family: Arial; background: #f0f0f0; padding: 20px; }
+  h2 { color: #333; }
+  input, button { padding: 5px 10px; margin: 5px; }
+  table { border-collapse: collapse; width: 60%; margin-top: 20px; }
+  th, td { border: 1px solid #333; padding: 8px; text-align: center; }
+  .Ready { background-color: yellow; }
+  .Running { background-color: lightgreen; }
+  .Waiting { background-color: orange; }
+  .Terminated { background-color: lightcoral; }
+  button { cursor: pointer; }
+</style>
+</head>
+<body>
+
+<h2>Simple Process Manager</h2>
+<input type="text" id="pname" placeholder="Process Name">
+<button onclick="createProcess()">Create Process</button>
+
+<table id="ptable">
+  <tr>
+    <th>PID</th>
+    <th>Name</th>
+    <th>State</th>
+    <th>Actions</th>
+  </tr>
+</table>
+
+<script>
+let processes = [];
+let pidCounter = 1;
+
+// إنشاء عملية جديدة
+function createProcess() {
+  let name = document.getElementById("pname").value;
+  if(!name) return alert("Enter process name!");
+  let p = {pid: pidCounter++, name: name, state: "Ready"};
+  processes.push(p);
+  document.getElementById("pname").value = "";
+  renderTable();
+}
+
+// تغيير حالة العملية
+function changeState(pid, newState) {
+  let p = processes.find(pr => pr.pid === pid);
+  if(p) { p.state = newState; renderTable(); }
+}
+
+// عرض الجدول
+function renderTable() {
+  let table = document.getElementById("ptable");
+  table.innerHTML = `
+    <tr>
+      <th>PID</th>
+      <th>Name</th>
+      <th>State</th>
+      <th>Actions</th>
+    </tr>`;
+  processes.forEach(p => {
+    let row = table.insertRow();
+    row.className = p.state;
+    row.insertCell(0).innerText = p.pid;
+    row.insertCell(1).innerText = p.name;
+    row.insertCell(2).innerText = p.state;
+    row.insertCell(3).innerHTML = `
+      <button onclick="changeState(${p.pid}, 'Running')">Start</button>
+      <button onclick="changeState(${p.pid}, 'Waiting')">Wait</button>
+      <button onclick="changeState(${p.pid}, 'Terminated')">Terminate</button>
+    `;
+  });
+}
+</script>
+
+</body>
+</html>
